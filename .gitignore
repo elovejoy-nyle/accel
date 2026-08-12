@@ -1,0 +1,12 @@
+# Temporary files
+*.tmp
+
+# Arduino build directories
+build/
+.build/
+arduino_build_*/
+
+# Common generated files
+*.hex
+*.elf
+*.map
