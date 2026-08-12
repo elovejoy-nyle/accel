@@ -10,6 +10,10 @@ These accelerometers are related devices with similar interfaces, but their meas
 * [ADXL356, ADXL357, and ADXL357B Datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/adxl356-357-357b.pdf)
 
 
+## qwiic connector wire diagram
+<img src="imgs/qwiic.png">
+<br>
+
 
 ## Limitations
 
