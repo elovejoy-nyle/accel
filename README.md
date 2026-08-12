@@ -11,7 +11,8 @@ These accelerometers are related devices with similar interfaces, but their meas
 
 
 ## qwiic connector wire diagram
-<img src="imgs/qwiic.png">
+hpc pin layout on the left. connections are not implied.
+<img src="imgs/hpc_i2c.png">
 <br>
 
 
