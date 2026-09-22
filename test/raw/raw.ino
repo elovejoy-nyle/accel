@@ -1,3 +1,6 @@
+/*
+Requested attributes are angle and amplitude
+*/
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ADXL343.h>
@@ -165,7 +168,7 @@ void loop(){
 
     //Serial.print("n");  // frame count
     //Serial.print(sequenceNumber++);
-    Serial.print(",x");
+    Serial.print("x");
     Serial.print(x);
     Serial.print(",y");
     Serial.print(y);

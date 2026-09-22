@@ -1,3 +1,25 @@
+DF Robot gravity SEN0412 vs Analog devices ADXL357B eval boards.
+
+# Review:
+The gravity board includes pull up resistors, while the  ADXL357B eval boards does not.
+( confussion in testing, ultimately irrelivent, as the HPC also has pull up resistors, only my testing MCU (kee boar) does not )
+Gravity_basic.ino       : a basic implementation
+Gravity_rms.ino         : individual rms
+Gravity_p2p_rms_frq.ino : p2p, rms, frq (reports max axis )
+
+
+
+#Refference material:
+https://vibrationresearch.com/resources/the-third-dimension-of-random-vibration-control/
+https://dfimg.dfrobot.com/wiki/21162/SEN0412_h3lis200dl-triple-axis-accelerometer_schematics_V1.0.pdf
+https://wiki.dfrobot.com/sen0412/
+
+https://www.analog.com/media/en/technical-documentation/user-guides/eval-adxl357b-ug-2204.pdf
+https://www.analog.com/media/en/technical-documentation/data-sheets/adxl356-357-357b.pdf
+
+
+
+
 # Accelerometer Shock Detection
 
 The ADXL343 and ADXL375 libraries do not currently include shock-detection support, so I may as well implement it.
