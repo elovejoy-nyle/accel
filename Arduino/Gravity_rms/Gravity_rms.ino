@@ -1,4 +1,4 @@
-/*
+/* CONFIG INFO::
 sensitivity:
 https://dfimg.dfrobot.com/wiki/21162/SEN0412_h3lis200dl-triple-axis-accelerometer_datasheet_V1.0.pdf
 page 9: Factor So:
@@ -32,64 +32,91 @@ Otherwise, a fast loop could count duplicate samples.
 #include <math.h>
 #include <Wire.h>
 
+// SEN0412: https://wiki.dfrobot.com/sen0412/
+// Datasheet:
+// https://dfimg.dfrobot.com/wiki/21162/SEN0412_h3lis200dl-triple-axis-accelerometer_datasheet_V1.0.pdf
+
 const uint8_t ADDR = 0x19;
-const uint16_t SAMPLE_SIZE = 100; // effects report time
+const uint16_t SAMPLE_SIZE = 100; // Samples per report; ~100 ms at 1000 Hz
+
+// Range settings must match:
+// +/-100 g: CTRL_REG4 = 0x00, G_PER_COUNT = 0.780f
+// +/-200 g: CTRL_REG4 = 0x10, G_PER_COUNT = 1.560f
+const uint8_t RANGE_SETTING = 0x10;
 const float G_PER_COUNT = 1.560f;
 
 uint32_t sumX2 = 0, sumY2 = 0, sumZ2 = 0;
 uint16_t samples = 0;
+int8_t minX, maxX, minY, maxY, minZ, maxZ;
 
 void setup() {
   Serial.begin(115200);
   Wire.begin();
-  Wire.setClock(400000);
+  Wire.setClock(400000);  // 400 kHz I2C
 
   Wire.beginTransmission(ADDR);
-  Wire.write(0x23);       // CTRL_REG4
-  Wire.write(0x10);       // ±200 g
+  Wire.write(0x23);       // CTRL_REG4: full-scale range selection
+  Wire.write(RANGE_SETTING);
   Wire.endTransmission();
 
   Wire.beginTransmission(ADDR);
-  Wire.write(0x20);       // CTRL_REG1
-  Wire.write(0x3F);       // 1000 Hz, enable XYZ
+  Wire.write(0x20);       // CTRL_REG1: normal mode, sample rate, enable XYZ
+  // 0x27 = 50 Hz, 0x2F = 100 Hz, 0x37 = 400 Hz, 0x3F = 1000 Hz
+  Wire.write(0x3F);
   Wire.endTransmission();
 }
 
 void loop() {
-  int8_t x, y, z;
-
   // Wait for a new XYZ sample
   Wire.beginTransmission(ADDR);
   Wire.write(0x27);       // STATUS_REG
-  Wire.endTransmission(false);
-  Wire.requestFrom(ADDR, 1);
-
-  if (!(Wire.read() & 0x08))
-    return;
+  if (Wire.endTransmission(false) != 0) return;
+  if (Wire.requestFrom(ADDR, (uint8_t)1) != 1) return;
+  if (!(Wire.read() & 0x08)) return;
 
   Wire.beginTransmission(ADDR);
-  Wire.write(0xA9);       // OUT_X + auto-increment
-  Wire.endTransmission(false);
-  Wire.requestFrom(ADDR, 5);
+  Wire.write(0xA9);       // OUT_X (0x29) + auto-increment
+  if (Wire.endTransmission(false) != 0) return;
+  if (Wire.requestFrom(ADDR, (uint8_t)5) != 5) return;
 
-  x = (int8_t)Wire.read();
-  Wire.read();
-  y = (int8_t)Wire.read();
-  Wire.read();
-  z = (int8_t)Wire.read();
+  int8_t x = (int8_t)Wire.read();
+  Wire.read();            // Skip reserved 0x2A
+  int8_t y = (int8_t)Wire.read();
+  Wire.read();            // Skip reserved 0x2C
+  int8_t z = (int8_t)Wire.read();
+
+  if (samples == 0) {
+    minX = maxX = x;
+    minY = maxY = y;
+    minZ = maxZ = z;
+  } else {
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+    if (z < minZ) minZ = z;
+    if (z > maxZ) maxZ = z;
+  }
 
   sumX2 += (int32_t)x * x;
   sumY2 += (int32_t)y * y;
   sumZ2 += (int32_t)z * z;
 
   if (++samples == SAMPLE_SIZE) {
-    Serial.print("RMS: ");
-    Serial.print(sqrtf((float)sumX2 / SAMPLE_SIZE) * G_PER_COUNT);
-    Serial.print(", ");
-    Serial.print(sqrtf((float)sumY2 / SAMPLE_SIZE) * G_PER_COUNT);
-    Serial.print(", ");
-    Serial.println(sqrtf((float)sumZ2 / SAMPLE_SIZE) * G_PER_COUNT);
+    float rmsTotal = sqrtf(
+      ((float)sumX2 + (float)sumY2 + (float)sumZ2) / samples
+    ) * G_PER_COUNT;
 
-    sumX2 = sumY2 = sumZ2 = samples = 0;
+    // Raw CSV: X peak-to-peak, Y peak-to-peak, Z peak-to-peak, total RMS
+    Serial.print(((int16_t)maxX - minX) * G_PER_COUNT, 3);
+    Serial.print(',');
+    Serial.print(((int16_t)maxY - minY) * G_PER_COUNT, 3);
+    Serial.print(',');
+    Serial.print(((int16_t)maxZ - minZ) * G_PER_COUNT, 3);
+    Serial.print(',');
+    Serial.println(rmsTotal, 3);
+
+    sumX2 = sumY2 = sumZ2 = 0;
+    samples = 0;
   }
 }
