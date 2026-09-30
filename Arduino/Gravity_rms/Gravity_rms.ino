@@ -1,3 +1,13 @@
+/*
+--Crude linux device data strea, save/ view method:
+stty -F /dev/ttyACM0 115200 raw -echo -ixon -ixoff
+cat /dev/ttyACM0 > compressor_vibration.csv
+
+cat /dev/ttyACM0 | tee compressor_vibration.csv
+
+*/
+
+
 /* CONFIG INFO::
 sensitivity:
 https://dfimg.dfrobot.com/wiki/21162/SEN0412_h3lis200dl-triple-axis-accelerometer_datasheet_V1.0.pdf
