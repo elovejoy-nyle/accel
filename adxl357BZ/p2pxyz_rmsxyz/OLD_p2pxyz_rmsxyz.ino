@@ -27,9 +27,6 @@ const uint8_t FILTER_SETTING = 0x03;
 // 0x03 = +/-40 g maximum; there is no 200 g mode.
 const uint8_t RANGE_SETTING = 0x03;
 
-// ADXL357B sensitivity at +/-40 g: 12800 counts per g.
-const double G_PER_COUNT = 1.0 / 12800.0;
-
 int32_t minX;
 int32_t maxX;
 int32_t minY;
@@ -212,14 +209,13 @@ void loop()
         int32_t peakToPeakZ = maxZ - minZ;
 
         double rmsTotal =
-            sqrt(sumMagnitudeSquared / (double)samples) * G_PER_COUNT;
+            sqrt(sumMagnitudeSquared / (double)samples);
 
-        // CSV values are X p-p, Y p-p, Z p-p, total RMS, all in g.
-        Serial.print(peakToPeakX * G_PER_COUNT, 3);
+        Serial.print(peakToPeakX);
         Serial.print(',');
-        Serial.print(peakToPeakY * G_PER_COUNT, 3);
+        Serial.print(peakToPeakY);
         Serial.print(',');
-        Serial.print(peakToPeakZ * G_PER_COUNT, 3);
+        Serial.print(peakToPeakZ);
         Serial.print(',');
         Serial.println(rmsTotal, 3);
 
