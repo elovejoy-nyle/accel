@@ -6,4 +6,8 @@ Concept: The Compressor bracket stays on the comprressor, such that repeatable t
 The sensor mounts to a plate that seats into a holder magneticaly stuck to the compressor.
 X,Y orientation maters. For convention, X,Y may be labled on the holder. 
 </pre>
-<img src="fertig.png">
+<img src="imgs/fertig.png">
+<img src="imgs/m3.png">
+<img src="imgs/m1.png">
+<img src="imgs/m2.png">
+<img src="imgs/m4.png">
