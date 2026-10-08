@@ -1,12 +1,9 @@
-# Temporary files
-*.tmp
+# Python cache directories
+__pycache__/
 
-# Arduino build directories
-build/
-.build/
-arduino_build_*/
+# Compiled Python files
+*.py[cod]
 
-# Common generated files
-*.hex
-*.elf
-*.map
+# ignore scratch
+scratch/
+test/
