@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <math.h>
-
+//stty -F /dev/ttyACM0 115200 raw -echo -ixon -ixoff
 const uint8_t ADXL357_ADDR = 0x1D;
 
 // ADXL357B registers
